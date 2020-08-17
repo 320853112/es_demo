@@ -125,4 +125,13 @@ public class TestOne {
 
     }
 
+    @Test
+    public void testGetInstance() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        User user = new User();
+        Class<? extends User> userClass = user.getClass();
+        User o = (User)Class.forName(userClass.getName()).newInstance();
+        System.out.println(o);
+
+    }
+
 }
