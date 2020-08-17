@@ -134,4 +134,10 @@ public class TestOne {
 
     }
 
+    @Test
+    public void testAssert(){
+        assert false:1+1;
+        System.out.println("ok");
+    }
+
 }

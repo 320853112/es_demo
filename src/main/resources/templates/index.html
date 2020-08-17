@@ -9,7 +9,7 @@
 </head>
 
 <body class="pg">
-<div class="page">
+<div class="page" id="app">
     <div id="mallPage" class=" mallist tmall- page-not-market ">
 
         <!-- 头部搜索 -->
@@ -86,21 +86,25 @@
                 <!-- 商品详情 -->
                 <div class="view grid-nosku">
 
-                    <div class="product">
+                    <div class="product" v-for="result in results">
                         <div class="product-iWrap">
                             <!--商品封面-->
                             <div class="productImg-wrap">
                                 <a class="productImg">
-                                    <img src="https://img.alicdn.com/bao/uploaded/i1/3899981502/O1CN01q1uVx21MxxSZs8TVn_!!0-item_pic.jpg">
+                                    <img :src="result.img">
+<!--                                    https://img.alicdn.com/bao/uploaded/i1/3899981502/O1CN01q1uVx21MxxSZs8TVn_!!0-item_pic.jpg-->
                                 </a>
                             </div>
                             <!--价格-->
                             <p class="productPrice">
-                                <em><b>¥</b>2590.00</em>
+                                <em>{{result.price}}</em>
+<!--                                <b>¥</b>2590.00-->
                             </p>
                             <!--标题-->
                             <p class="productTitle">
-                                <a> dkny秋季纯色a字蕾丝dd商场同款连衣裙 </a>
+                                <a v-html="result.title"></a>
+<!--                                {{result.title}}-->
+<!--                                dkny秋季纯色a字蕾丝dd商场同款连衣裙-->
                             </p>
                             <!-- 店铺名 -->
                             <div class="productShop">
@@ -130,10 +134,15 @@
             keyword:'',
             results: []
         },
-        method:{
+        methods:{
             searchKey(){
                 var keyword = this.keyword;
                 console.log(keyword);
+                //对接后端的接口
+                axios.get('search/'+"1&10&"+keyword).then(response=>{
+                        console.log(response);
+                        this.results = response.data;
+                    })
             }
         }
     })

@@ -15,12 +15,15 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -78,6 +81,46 @@ public class ContentService {
         ArrayList<Map<String,Object>> list = new ArrayList();
         for (SearchHit hit : searchResponse.getHits().getHits()) {
             list.add(hit.getSourceAsMap());
+        }
+        return list;
+    }
+
+    //getHighLightData
+    public List<Map<String,Object>> searchHighLightPage(String keyword,int pageNum,int pageSize) throws IOException {
+        SearchRequest searchRequest = new SearchRequest("jd_goods");
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        //分页
+        sourceBuilder.from(pageNum);
+        sourceBuilder.size(pageSize);
+        //创建精准匹配条件
+        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("title", keyword);
+        sourceBuilder.query(termQueryBuilder);
+        sourceBuilder.timeout(new TimeValue(60, TimeUnit.SECONDS));
+        //高亮
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.field("title");
+        highlightBuilder.requireFieldMatch(false);
+        highlightBuilder.preTags("<span style='color:red'>");
+        highlightBuilder.postTags("</span>");
+        sourceBuilder.highlighter(highlightBuilder);
+        searchRequest.source(sourceBuilder);
+        SearchResponse searchResponse = esClient.search(searchRequest, RequestOptions.DEFAULT);
+        //解析结果
+        ArrayList<Map<String,Object>> list = new ArrayList();
+        for (SearchHit hit : searchResponse.getHits().getHits()) {
+            //解析高亮字段
+            Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+            HighlightField title = highlightFields.get("title");
+            Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+            if(title!=null){
+                Text[] fragments = title.fragments();
+                StringBuilder n_title = new StringBuilder();
+                for (Text text : fragments) {
+                    n_title.append(text);
+                }
+                sourceAsMap.put("title",n_title);
+            }
+            list.add(sourceAsMap);
         }
         return list;
     }
