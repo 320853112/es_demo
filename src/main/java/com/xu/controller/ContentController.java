@@ -20,6 +20,12 @@ public class ContentController {
         return contentService.parseContent(indexName, keyword);
     }
 
+    @RequestMapping("/paresJD4EsFor/{indexName}&{keyword}")
+    public Boolean paresJD4EsFor(@PathVariable String indexName,@PathVariable String keyword) throws Exception {
+        return contentService.parseContentFor(indexName, keyword);
+    }
+
+
     @RequestMapping("/createIndex/{indexName}")
     public Boolean createIndex(@PathVariable String indexName) throws Exception{
         return contentService.createEsIndex(indexName);

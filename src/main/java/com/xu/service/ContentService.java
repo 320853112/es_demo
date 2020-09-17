@@ -125,4 +125,17 @@ public class ContentService {
         return list;
     }
 
+    public Boolean parseContentFor(String indexName, String keyword)  {
+        try {
+            for (int i = 1; i < 400; i++) {
+                parseContent(indexName, keyword + "&" + i);
+                System.out.println("run");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return true;
+
+    }
 }

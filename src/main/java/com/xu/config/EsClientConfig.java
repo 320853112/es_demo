@@ -17,7 +17,6 @@ public class EsClientConfig {
                 new HttpHost("localhost", 9200, "http")
         ));
         return restHighLevelClient;
-
     }
 
 }
